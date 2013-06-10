@@ -1,0 +1,1 @@
+* Rubbersnake - A model mapper for elasticsearch
