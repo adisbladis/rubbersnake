@@ -13,23 +13,35 @@ class User(rs.Model):
 
     username = rs.types.String()
     active = rs.types.Bool(default=True)
-    age = rs.types.Num()
     registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
     userlevel = rs.types.Enum("MEMBER", "ADMIN", default="MEMBER")
+
+    testlist = rs.types.List(rs.types.Num())
+
+    searchprofile = rs.types.Dict({
+        "lookingForMinAge": rs.types.Num(min=18, max=99, default=18),
+        "lookingForMaxAge": rs.types.Num(min=18, max=99, default=99),
+        "testhest": rs.types.Dict({
+            "a": rs.types.Num(default=10),
+            "b": rs.types.Num(default=20)
+        })
+    })
 
 users = [
     User({
         "username": "AOEU",
-        "age": i,
         "example": ["A", 3],
         "profile": {
             "test": "AOEU"
         }
     })
-    for i in range(1,5)]
-users = rs.Query(User).search({})
-users = rs.Query.save(users)
-
+    for i in range(1,2)]
+#users = rs.Query.save(users)
+#users = rs.Query(User).search({})
+for user in users:
+    user.testlist = ["A"]
+    #user. searchprofile["testhest"]["a"] = "AOEU"
+    user.__validate__()
 
 #print(users)
 #rs.Query(User).delete(users)

@@ -39,8 +39,7 @@ class _BaseType(object):
 
         #Validate against parent types
         if True not in [isinstance(value, i) for i in self.parent]:
-            if not (self.null and isinstance(value, _BaseType)):
-                raise ValueError("Value '{0}' not allowed".format(value))
+            raise ValueError("Value '{0}' not allowed".format(value))
 
 class String(_BaseType):
     '''
@@ -125,6 +124,8 @@ class List(_BaseType):
 
     def __init__(self, *args, **kwargs):
         self.parent = args
+        if "default" not in kwargs:
+            kwargs["default"] = []
         super(List, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -155,6 +156,19 @@ class Dict(_BaseType):
 
     def __init__(self, comp={}, **kwargs):
         self._comp = comp
+
+        if kwargs.get("null"):
+            default = None
+        else:
+            default = {}
+            for key in comp:
+                if isinstance(comp[key], _BaseType):
+                    value = comp[key].default
+                    if hasattr(value, "__call__"):
+                        value = value()
+                    default[key] = value
+
+        kwargs["default"] = default
         super(Dict, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -164,9 +178,6 @@ class Dict(_BaseType):
 
         if value == None:
             raise ValueNullException()
-
-        if True not in [isinstance(value, i) for i in self.parent]:
-            raise ValueException("Value invalid")
 
         for key in self._comp.keys():
             self._comp[key].validate(value.get(key))

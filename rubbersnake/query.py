@@ -68,6 +68,7 @@ class Query(object):
             "_search?{0}".format(
                 urllib.urlencode(kwargs.items())
             )))
+
         return self.map(
             self.models[0]._pool.es.get(path, data=query, json_decoder=json.loads).get("hits", {}).get("hits"))
 
@@ -106,7 +107,8 @@ class Query(object):
         request += "\n" #Trailing newline required
 
         for idx, item in enumerate(es.post("_bulk", data=request).get("items")):
-            models[idx]._id = item.get("create", item.get("index")).get("_id")
+            if "create" in item:
+                models[idx]._id = item.get("create").get("_id")
         return models
 
     @staticmethod
