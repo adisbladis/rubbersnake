@@ -5,3 +5,6 @@ See [[./example.py]]
 
 ** License
 Apache License 2.0
+
+** Dependencies
+Needs my patched version of rawes [[https://github.com/adisbladis/rawes/tree/json_decoder]]
