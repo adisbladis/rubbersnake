@@ -34,8 +34,8 @@ class _BaseType(object):
     def validate(self, value):
 
         #Validations that should be done for all types
-        if not self.null and value == None:
-            raise ValueNullException()
+        if self.null and value is None:
+            return #No need to go any further
 
         #Validate against parent types
         if True not in [isinstance(value, i) for i in self.parent]:
