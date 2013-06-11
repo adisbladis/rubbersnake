@@ -1,48 +1,48 @@
 #!/usr/bin/env python
+'''
+Simple usage example of rubbersnake
+'''
 
 import rubbersnake as rs
 import datetime
 
+#Instantiate a pool
 ServerPool = rs.ElasticPool()
 
 class User(rs.Model):
 
     #Index is a mandatory mapping
     _index = "users"
+    #A model must have a _pool mapping
     _pool = ServerPool
 
+    #User properties
     username = rs.types.String()
     active = rs.types.Bool(default=True)
-    registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
     userlevel = rs.types.Enum("MEMBER", "ADMIN", default="MEMBER")
 
-    testlist = rs.types.List(rs.types.Num())
+    #Callables are fine as default values too
+    registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
 
-    searchprofile = rs.types.Dict({
-        "lookingForMinAge": rs.types.Num(min=18, max=99, default=18),
-        "lookingForMaxAge": rs.types.Num(min=18, max=99, default=99),
-        "testhest": rs.types.Dict({
-            "a": rs.types.Num(default=10),
-            "b": rs.types.Num(default=20)
-        })
+    profile = rs.types.Dict({
+        #A list of strings with max length 100 chars
+        "interests": rs.types.List(rs.types.String(max=100))
     })
 
-users = [
-    User({
-        "username": "AOEU",
-        "example": ["A", 3],
-        "profile": {
-            "test": "AOEU"
-        }
-    })
-    for i in range(1,2)]
-#users = rs.Query.save(users)
-#users = rs.Query(User).search({})
-for user in users:
-    user.testlist = ["A"]
-    #user. searchprofile["testhest"]["a"] = "AOEU"
-    user.__validate__()
+#Instantiate a new user and save it
+#Before save a model is always validated
+user = User({
+    "username": "foobar",
+})
+user = rs.Query.save(user)
+print("Created user {0}".format(user._id))
 
-#print(users)
-#rs.Query(User).delete(users)
-#rs.Query.delete("oVgYn55sSWmml-QTVwC7zg", _index="users", _type="User", pool=ServerPool)
+#You can also trigger validations manually
+user.__validate__()
+
+#Finally, lets delete the user we just created
+#Delete accepts an id, a model instance or a list
+rs.Query.delete(user)
+print("Deleted user")
+#Or the more raw approach
+rs.Query.delete("userid", _index="users", _type="User", pool=ServerPool)

@@ -1,1 +1,7 @@
 * Rubbersnake - A model mapper for elasticsearch
+
+** Usage
+See [[./example.py]]
+
+** License
+Apache License 2.0

@@ -82,7 +82,9 @@ class Query(object):
         '''
 
         #Normalize data into list
+        normalized = False
         if not isinstance(models, list):
+            normalized = True
             models = [models]
 
         #Build request
@@ -109,7 +111,11 @@ class Query(object):
         for idx, item in enumerate(es.post("_bulk", data=request).get("items")):
             if "create" in item:
                 models[idx]._id = item.get("create").get("_id")
-        return models
+
+        if not normalized:
+            return models
+        else:
+            return models[0]
 
     @staticmethod
     def delete(models, _index=None, _type=None, pool=None):
