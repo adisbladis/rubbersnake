@@ -48,6 +48,24 @@ class Model(object):
             if val is not None:
                 setattr(self, i, val)
 
+    def __mapping__(self):
+        '''
+        Generate mapping dict for model instance
+        '''
+
+        mapping = {}
+        for i in self.__properties__:
+            current = getattr(self.__class__, i).map()
+            if current is not None:
+                mapping[i] = current
+
+        return {
+            self.__class__.__name__: {
+                "properties": mapping
+            }
+        }
+
+
     def __validate__(self):
         '''
         Validate model

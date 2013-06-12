@@ -24,12 +24,20 @@ class _BaseType(object):
     Common type properties and validations
     '''
 
-    def __init__(self, default=None, max=None, min=None, null=False):
+    def __init__(self, default=None, max=None, min=None, null=False, mapping={}):
         #Parent class is specified in each type class, not here
         self.default = default() if hasattr(default, '__call__') else default
         self.max = max
         self.min = min
         self.null = null
+
+        self.mapping = mapping
+
+    def map(self):
+        mapping = self.mapping.copy()
+        if self.eltype is not None and "type" not in mapping:
+            mapping["type"] = self.eltype
+        return mapping if mapping else None
 
     def validate(self, value):
 
@@ -49,6 +57,7 @@ class String(_BaseType):
     def __init__(self, **kwargs):
 
         self.parent = [str]
+        self.eltype = "string"
 
         #Unicode is deprecated in Py3K
         if sys.version_info[0] < 3:
@@ -71,6 +80,7 @@ class Bool(_BaseType):
     '''
 
     parent = [bool]
+    eltype = "boolean"
 
 class Num(_BaseType):
     '''
@@ -78,6 +88,7 @@ class Num(_BaseType):
     '''
 
     parent = [int, float]
+    eltype = "integer"
 
     def validate(self, value):
         super(Num, self).validate(value)
@@ -94,6 +105,7 @@ class DateTime(_BaseType):
     '''
 
     parent = [datetime.datetime]
+    eltype = "date"
 
     def validate(self, value):
         super(DateTime, self).validate(value)
@@ -111,6 +123,7 @@ class Enum(_BaseType):
 
     def __init__(self, *values, **kwargs):
         self._values = values
+        self.eltype = None
         super(Enum, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -127,6 +140,9 @@ class List(_BaseType):
         if "default" not in kwargs:
             kwargs["default"] = []
         super(List, self).__init__(**kwargs)
+
+    def map(self):
+        return None #Lists not supported yet
 
     def validate(self, value):
         #No need to run validation if null is allowed and value is null
@@ -170,6 +186,19 @@ class Dict(_BaseType):
 
         kwargs["default"] = default
         super(Dict, self).__init__(**kwargs)
+
+    def map(self):
+
+        mapping = {}
+        for key in self._comp:
+            current = {}
+            if current is not None:
+                mapping[key] = self._comp[key].map()
+
+        return {
+            "type": "object",
+            "properties": mapping
+        }
 
     def validate(self, value):
         #No need to run validation if null is allowed and value is null

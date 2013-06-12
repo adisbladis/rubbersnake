@@ -17,7 +17,7 @@ class User(rs.Model):
     _pool = ServerPool
 
     #User properties
-    username = rs.types.String()
+    username = rs.types.String(mapping={"index": "not_analyzed"})
     active = rs.types.Bool(default=True)
     userlevel = rs.types.Enum("MEMBER", "ADMIN", default="MEMBER")
 
@@ -29,6 +29,10 @@ class User(rs.Model):
         "interests": rs.types.List(rs.types.String(max=100))
     })
 
+#Get a mapping dict for the model
+User().__mapping__()
+
+exit(0)
 #Instantiate a new user and save it
 #Before save a model is always validated
 user = User({
