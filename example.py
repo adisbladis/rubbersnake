@@ -32,14 +32,13 @@ class User(rs.Model):
 #Get a mapping dict for the model
 User().__mapping__()
 
-exit(0)
 #Instantiate a new user and save it
 #Before save a model is always validated
 user = User({
     "username": "foobar",
 })
 user = rs.Query.save(user)
-print("Created user {0}".format(user._id))
+print("Created user {0}".format(user.id))
 
 #You can also trigger validations manually
 user.__validate__()

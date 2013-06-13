@@ -55,7 +55,7 @@ class Query(object):
         ret = []
         for i in results:
             doc = i.get("_source")
-            doc["_id"] = i["_id"]
+            doc["id"] = i["_id"]
             ret.append(self.modelmap["/".join((i["_index"], i["_type"]))](doc))
         return ret
 
@@ -101,8 +101,8 @@ class Query(object):
                     "_type": i.__class__.__name__
                 }
             }
-            if i._id != None:
-               req["index"]["_id"] = i._id
+            if i.id is not None:
+               req["index"]["_id"] = i.id
             request.append(req)
             request.append(i.__dict__)
         request = "\n".join([json.dumps(i) for i in request])
@@ -110,7 +110,7 @@ class Query(object):
 
         for idx, item in enumerate(es.post("_bulk", data=request).get("items")):
             if "create" in item:
-                models[idx]._id = item.get("create").get("_id")
+                models[idx].id = item.get("create").get("_id")
 
         if not normalized:
             return models
@@ -132,11 +132,11 @@ class Query(object):
 
         for i in models:
             if isinstance(i, Model):
-                if i._id == None: #Can't delete an unsaved model
+                if i.id == None: #Can't delete an unsaved model
                     continue
                 if not pool:
                     pool = i._pool
-                request.append({ "delete" : { "_index" : i._index, "_type" : i.__class__.__name__, "_id" : i._id}})
+                request.append({ "delete" : { "_index" : i._index, "_type" : i.__class__.__name__, "_id" : i.id}})
             else:
                 if not _index or not _type:
                     raise ValueError("Value not model instance and missing _index or _type")

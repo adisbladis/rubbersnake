@@ -26,7 +26,7 @@ class _BaseType(object):
 
     def __init__(self, default=None, max=None, min=None, null=False, mapping={}):
         #Parent class is specified in each type class, not here
-        self.default = default() if hasattr(default, '__call__') else default
+        self.default = default
         self.max = max
         self.min = min
         self.null = null

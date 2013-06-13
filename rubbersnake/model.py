@@ -41,7 +41,7 @@ class Model(object):
         Load a dict into model instance
         '''
 
-        self._id = data.get("_id")
+        self.id = data.get("_id", data.get("id"))
         data = data.get("_source") if "_source" in data else data
         for i in self.__properties__:
             val = data.get(i)
@@ -95,4 +95,6 @@ class Model(object):
         JSON representation for model
         '''
 
-        return json.dumps(self.__dict__)
+        d = self.__dict__
+        d["_id"] = self.id
+        return json.dumps(d)
