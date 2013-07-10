@@ -15,6 +15,8 @@ class User(rs.Model):
     _index = "users"
     #A model must have a _pool mapping
     _pool = ServerPool
+    #Optionally extra mappings can be added (properties will be overriden with your model data)
+    #_mapping = {}
 
     #User properties
     username = rs.types.String(mapping={"index": "not_analyzed"})
@@ -30,7 +32,7 @@ class User(rs.Model):
     })
 
 #Get a mapping dict for the model
-User().__mapping__()
+print(User().__mapping__())
 
 #Instantiate a new user and save it
 #Before save a model is always validated

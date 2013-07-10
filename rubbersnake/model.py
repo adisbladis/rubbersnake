@@ -53,18 +53,19 @@ class Model(object):
         Generate mapping dict for model instance
         '''
 
-        mapping = {}
+        #Get mappings from properties
+        properties = {} 
         for i in self.__properties__:
             current = getattr(self.__class__, i).map()
             if current is not None:
-                mapping[i] = current
+                properties[i] = current
 
-        return {
-            self.__class__.__name__: {
-                "properties": mapping
-            }
-        }
+        mapping = self._mapping if hasattr(self, "_mapping") else {}
+        if not isinstance(mapping, dict):
+            raise ValueError("_mapping is not dict")
 
+        mapping["properties"] = properties
+        return {self.__class__.__name__: mapping}
 
     def __validate__(self):
         '''
