@@ -24,7 +24,7 @@ class Model(object):
     Base model
     '''
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, **options):
 
         #Set default values
         for i in self.__properties__:
@@ -35,6 +35,8 @@ class Model(object):
 
         if data:
             self.__load__(data)
+
+        self._options = options
 
     def __load__(self, data):
         '''

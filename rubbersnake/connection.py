@@ -21,7 +21,7 @@ import random
 
 class ElasticPool(object):
     '''
-    Pool of rawes instances
+    Pool of hostnames
     '''
     def __init__(self, urls=["http://localhost:9200"], timeout=30, **kwargs):
         self.pool = {}
@@ -33,13 +33,17 @@ class ElasticPool(object):
         '''
         Get a random rawes instance from the pool
         '''
-        return self.pool[random.choice(self.pool.keys())]
+        key = random.choice(self.pool.keys())
+        return rawes.Elastic(url=key, timeout=self.pool[key]["timeout"], **self.pool[key]["kwargs"])
 
     def add(self, url, timeout=30, **kwargs):
         '''
         Add a connection to the pool
         '''
-        self.pool[url] = rawes.Elastic(url=url, timeout=timeout, **kwargs)
+        self.pool[url] = {
+            "kwargs": kwargs,
+            "timeout": timeout
+        }
 
     def remove(self, url):
         '''

@@ -26,11 +26,6 @@ class User(rs.Model):
     #Callables are fine as default values too
     registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
 
-    profile = rs.types.Dict({
-        #A list of strings with max length 100 chars
-        "interests": rs.types.List(rs.types.String(max=100))
-    })
-
 #Get a mapping dict for the model
 print(User().__mapping__())
 
@@ -38,7 +33,7 @@ print(User().__mapping__())
 #Before save a model is always validated
 user = User({
     "username": "foobar",
-})
+}, _parent="AOEU")
 user = rs.Query.save(user)
 print("Created user {0}".format(user.id))
 
@@ -47,7 +42,7 @@ user.__validate__()
 
 #Finally, lets delete the user we just created
 #Delete accepts an id, a model instance or a list
-rs.Query.delete(user)
-print("Deleted user")
+#rs.Query.delete(user)
+#print("Deleted user")
 #Or the more raw approach
 rs.Query.delete("userid", _index="users", _type="User", pool=ServerPool)

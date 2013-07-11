@@ -15,6 +15,7 @@
 #   limitations under the License.
 #
 
+import copy
 import urllib
 from . import json
 from .model import Model
@@ -94,16 +95,14 @@ class Query(object):
             if not es:
                 es = i._pool.es
             i.__validate__()
-            
-            req = {
-                "index": {
-                    "_index": i._index,
-                    "_type": i.__class__.__name__
-                }
-            }
+
+            req = dict(i._options.items()+[("_index", i._index), ("_type", i.__class__.__name__)])
+            req = {"index": req}
             if i.id is not None:
                req["index"]["_id"] = i.id
             request.append(req)
+            for attr in ("id", "_options"):
+                delattr(i, attr)
             request.append(i.__dict__)
         request = "\n".join([json.dumps(i) for i in request])
         request += "\n" #Trailing newline required
