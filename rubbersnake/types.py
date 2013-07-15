@@ -135,14 +135,14 @@ class List(_BaseType):
     List type
     '''
 
-    def __init__(self, *args, **kwargs):
-        self.parent = args
+    def __init__(self, parent, **kwargs):
+        self.parent = parent
         if "default" not in kwargs:
             kwargs["default"] = []
         super(List, self).__init__(**kwargs)
 
     def map(self):
-        return None #Lists not supported yet
+        return self.parent.map()
 
     def validate(self, value):
         #No need to run validation if null is allowed and value is null
@@ -154,12 +154,11 @@ class List(_BaseType):
 
         for i in value:
             valid = False
-            for p in self.parent:
-                try:
-                    p.validate(i)
-                    valid = True
-                except Exception as e:
-                    pass
+            try:
+                self.parent.validate(i)
+                valid = True
+            except Exception as e:
+                pass
             if not valid:
                 raise ValueError("Value '{0}' not allowed".format(i))
 
