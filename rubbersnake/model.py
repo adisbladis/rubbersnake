@@ -77,9 +77,6 @@ class Model(object):
         if not hasattr(self, "_index"):
             raise ValueError("Missing _index mapping")
 
-        if not hasattr(self, "_pool"):
-            raise ValueError("Missing _pool mapping")
-
         for i in self.__properties__:
             getattr(self.__class__, i).validate(getattr(self, i))
 
