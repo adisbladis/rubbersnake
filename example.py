@@ -6,15 +6,11 @@ Simple usage example of rubbersnake
 import rubbersnake as rs
 import datetime
 
-#Instantiate a pool
-ServerPool = rs.ElasticPool()
-
 class User(rs.Model):
 
     #Index is a mandatory mapping
     _index = "users"
     #A model must have a _pool mapping
-    _pool = ServerPool
     #Optionally extra mappings can be added (properties will be overriden with your model data)
     #_mapping = {}
 
@@ -30,19 +26,9 @@ class User(rs.Model):
 print(User().__mapping__())
 
 #Instantiate a new user and save it
-#Before save a model is always validated
 user = User({
     "username": "foobar",
 }, _parent="AOEU")
-user = rs.Query.save(user)
-print("Created user {0}".format(user.id))
 
 #You can also trigger validations manually
 user.__validate__()
-
-#Finally, lets delete the user we just created
-#Delete accepts an id, a model instance or a list
-#rs.Query.delete(user)
-#print("Deleted user")
-#Or the more raw approach
-rs.Query.delete("userid", _index="users", _type="User", pool=ServerPool)
