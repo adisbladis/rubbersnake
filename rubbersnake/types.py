@@ -17,7 +17,6 @@
 
 import sys
 import datetime
-from .exceptions import *
 
 class _BaseType(object):
     '''
@@ -70,9 +69,9 @@ class String(_BaseType):
 
         if value:
             if self.max and len(value) > self.max:
-                raise ValueTooLargeException()
+                raise OverflowError()
             if self.min and len(value) < self.min:
-                raise ValueTooSmallException()
+                raise OverflowError()
 
 class Bool(_BaseType):
     '''
@@ -95,9 +94,9 @@ class Num(_BaseType):
 
         if value:
             if self.max and value > self.max:
-                raise ValueTooLargeException()
+                raise OverflowError()
             if self.min and value < self.min:
-                raise ValueTooSmallException()
+                raise OverflowError()
 
 class DateTime(_BaseType):
     '''
@@ -112,9 +111,9 @@ class DateTime(_BaseType):
 
         if value:
             if self.max and value > self.max:
-                raise ValueTooLargeException()
+                raise OverflowError()
             if self.min and value < self.min:
-                raise ValueTooSmallException()
+                raise OverflowError()
 
 class Enum(_BaseType):
     '''
@@ -128,7 +127,7 @@ class Enum(_BaseType):
 
     def validate(self, value):
         if value not in self._values:
-            raise ValueException("Value {0} not valid for this enum".format(value))
+            raise TypeError("Value {0} not valid for this enum".format(value))
 
 class List(_BaseType):
     '''
@@ -150,7 +149,7 @@ class List(_BaseType):
             return
 
         if not isinstance(value, tuple) and not isinstance(value, list):
-            raise ValueException("List neither tuple nor list")
+            raise TypeError("List neither tuple nor list")
 
         for i in value:
             valid = False
@@ -205,7 +204,7 @@ class Dict(_BaseType):
             return
 
         if value == None:
-            raise ValueNullException()
+            raise TypeError("Value null not allowed")
 
         for key in self._comp.keys():
             self._comp[key].validate(value.get(key))
