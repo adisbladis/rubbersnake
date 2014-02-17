@@ -6,13 +6,8 @@ Simple usage example of rubbersnake
 import rubbersnake as rs
 import datetime
 
-class User(rs.Model):
 
-    #Index is a mandatory mapping
-    _index = "users"
-    #A model must have a _pool mapping
-    #Optionally extra mappings can be added (properties will be overriden with your model data)
-    #_mapping = {}
+class User(rs.Model):
 
     #User properties
     username = rs.types.String(mapping={"index": "not_analyzed"})
@@ -22,8 +17,12 @@ class User(rs.Model):
     #Callables are fine as default values too
     registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
 
+    #Optionally extra mappings can be added (properties will be overriden with your model data)
+    #_mapping = {}
+
+
 #Get a mapping dict for the model
-print(User().__mapping__())
+print(User().__mapping__)
 
 #Instantiate a new user and save it
 user = User({

@@ -23,10 +23,6 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, "README.org")).read()
 
-install_requires = [
-    'requests>=0.5.2'
-]
-
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
@@ -34,7 +30,7 @@ classifiers = [
 ]
 
 setup(name='rubbersnake',
-      version='0.0.1',
+      version='0.0.2',
       description='Python model mapper for elasticsearch',
       long_description=README,
       author='Adam Höse',
@@ -45,6 +41,5 @@ setup(name='rubbersnake',
       include_package_data=True,
       zip_safe=False,
       classifiers=classifiers,
-      install_requires=install_requires,
       packages=find_packages()
       )

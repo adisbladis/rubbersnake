@@ -16,7 +16,6 @@
 #
 
 from .types import _BaseType
-from . import json
 
 
 class Model(object):
@@ -43,13 +42,16 @@ class Model(object):
         Load a dict into model instance
         '''
 
-        self.id = data.get("_id", data.get("id"))
+        id = data.get("_id")
+        if id:
+            self.id = id
         data = data.get("_source") if "_source" in data else data
         for i in self.__properties__:
             val = data.get(i)
             if val is not None:
                 setattr(self, i, val)
 
+    @property
     def __mapping__(self):
         '''
         Generate mapping dict for model instance
@@ -74,11 +76,23 @@ class Model(object):
         Validate model
         '''
 
-        if not hasattr(self, "_index"):
-            raise ValueError("Missing _index mapping")
-
         for i in self.__properties__:
             getattr(self.__class__, i).validate(getattr(self, i))
+
+    @property
+    def __dict__(self):
+        '''
+        Return dict of properties
+        '''
+        d = {
+            i: getattr(self, i)
+            for i in self.__properties__
+        }
+
+        if hasattr(self, 'id'):
+            d["_id"] = self.id
+
+        return d
 
     @property
     def __properties__(self):
@@ -88,13 +102,3 @@ class Model(object):
 
         return [i for i in dir(self.__class__)
                 if isinstance(getattr(self.__class__, i), _BaseType)]
-
-    @property
-    def __json__(self):
-        '''
-        JSON representation for model
-        '''
-
-        d = self.__dict__
-        d["_id"] = self.id
-        return json.dumps(d)
