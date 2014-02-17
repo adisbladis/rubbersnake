@@ -43,8 +43,6 @@ class Model(object):
         '''
 
         id = data.get("_id")
-        if id:
-            self.id = id
         data = data.get("_source") if "_source" in data else data
         for i in self.__properties__:
             val = data.get(i)
@@ -88,9 +86,6 @@ class Model(object):
             i: getattr(self, i)
             for i in self.__properties__
         }
-
-        if hasattr(self, 'id'):
-            d["_id"] = self.id
 
         return d
 

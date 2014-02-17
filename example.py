@@ -28,6 +28,7 @@ print(User().__mapping__)
 user = User({
     "username": "foobar",
 }, _parent="AOEU")
+print(user.__dict__)
 
 #You can also trigger validations manually
 user.__validate__()
