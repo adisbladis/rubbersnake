@@ -187,16 +187,18 @@ class Dict(_BaseType):
 
     def map(self):
 
-        mapping = {}
+        mapping = self.mapping.copy()
+        if "type" not in mapping:
+            mapping["type"] = "object"
+
+        properties = {}
         for key in self._comp:
             current = {}
             if current is not None:
-                mapping[key] = self._comp[key].map()
+                properties[key] = self._comp[key].map()
+        mapping["properties"] = properties
 
-        return {
-            "type": "object",
-            "properties": mapping
-        }
+        return mapping
 
     def validate(self, value):
         #No need to run validation if null is allowed and value is null

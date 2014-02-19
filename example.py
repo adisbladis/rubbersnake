@@ -5,7 +5,7 @@ Simple usage example of rubbersnake
 
 import rubbersnake as rs
 import datetime
-
+from pprint import pprint
 
 class User(rs.Model):
 
@@ -17,18 +17,23 @@ class User(rs.Model):
     #Callables are fine as default values too
     registrationdate = rs.types.DateTime(default=lambda : datetime.datetime.utcnow())
 
+    meta = rs.types.Dict({
+        "test": rs.types.String(null=True)
+    }, mapping={
+        "type": "nested"
+    })
+
     #Optionally extra mappings can be added (properties will be overriden with your model data)
     #_mapping = {}
 
-
 #Get a mapping dict for the model
-print(User().__mapping__)
+pprint(User().__mapping__)
 
 #Instantiate a new user and save it
 user = User({
     "username": "foobar",
 }, _parent="AOEU")
-print(user.__dict__)
+pprint(user.__dict__)
 
 #You can also trigger validations manually
 user.__validate__()
