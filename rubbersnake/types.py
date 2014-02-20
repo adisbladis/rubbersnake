@@ -152,14 +152,7 @@ class List(_BaseType):
             raise TypeError("List neither tuple nor list")
 
         for i in value:
-            valid = False
-            try:
-                self.parent.validate(i)
-                valid = True
-            except Exception as e:
-                pass
-            if not valid:
-                raise ValueError("Value '{0}' not allowed".format(i))
+            self.parent.validate(i)
 
 class Dict(_BaseType):
     '''
@@ -168,14 +161,15 @@ class Dict(_BaseType):
 
     parent = [dict]
 
-    def __init__(self, comp={}, **kwargs):
+    def __init__(self, comp=None, **kwargs):
+        comp = comp if comp is not None else {}
         self._comp = comp
 
         if kwargs.get("null"):
             default = None
         else:
             default = {}
-            for key in comp:
+            for key in self._comp:
                 if isinstance(comp[key], _BaseType):
                     value = comp[key].default
                     if hasattr(value, "__call__"):
@@ -205,7 +199,7 @@ class Dict(_BaseType):
         if self.null and value == None:
             return
 
-        if value == None:
+        if value is None:
             raise TypeError("Value null not allowed")
 
         for key in self._comp.keys():

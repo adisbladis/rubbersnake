@@ -27,7 +27,8 @@ class User(rs.Model):
     #_mapping = {}
 
 #Get a mapping dict for the model
-pprint(User().__mapping__)
+import json
+pprint(json.dumps(User().__mapping__))
 
 #Instantiate a new user and save it
 user = User({
