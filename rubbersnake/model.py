@@ -74,8 +74,8 @@ class Model(object):
         Validate model
         '''
 
-        for i in self.__properties__:
-            getattr(self.__class__, i).validate(getattr(self, i))
+        for name in self.__properties__:
+            getattr(self.__class__, name).validate(getattr(self, name), name=name)
 
     @property
     def __dict__(self):

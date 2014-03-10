@@ -38,7 +38,7 @@ class _BaseType(object):
             mapping["type"] = self.eltype
         return mapping if mapping else None
 
-    def validate(self, value):
+    def validate(self, value, name=''):
 
         #Validations that should be done for all types
         if self.null and value is None:
@@ -46,7 +46,7 @@ class _BaseType(object):
 
         #Validate against parent types
         if True not in [isinstance(value, i) for i in self.parent]:
-            raise ValueError("Value '{0}' not allowed".format(value))
+            raise ValueError("'{0}' invalid for field '{1}'".format(value, name))
 
 class String(_BaseType):
     '''
@@ -64,14 +64,18 @@ class String(_BaseType):
             
         super(String, self).__init__(**kwargs)
 
-    def validate(self, value):
-        super(String, self).validate(value)
+    def validate(self, value, name=''):
+        super(String, self).validate(value, name=name)
 
         if value:
             if self.max and len(value) > self.max:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid '{1}'".format(value, name)
+                )
             if self.min and len(value) < self.min:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid for field '{1}'".format(value, name)
+                )
 
 class Bool(_BaseType):
     '''
@@ -89,14 +93,18 @@ class Num(_BaseType):
     parent = [int, float]
     eltype = "integer"
 
-    def validate(self, value):
-        super(Num, self).validate(value)
+    def validate(self, value, name=''):
+        super(Num, self).validate(value, name=name)
 
         if value:
             if self.max and value > self.max:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid for field '{1}'".format(value, name)
+                )
             if self.min and value < self.min:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid for field '{1}'".format(value, name)
+                )
 
 class DateTime(_BaseType):
     '''
@@ -106,14 +114,18 @@ class DateTime(_BaseType):
     parent = [datetime.datetime]
     eltype = "date"
 
-    def validate(self, value):
-        super(DateTime, self).validate(value)
+    def validate(self, value, name=''):
+        super(DateTime, self).validate(value, name=name)
 
         if value:
             if self.max and value > self.max:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid for field '{1}'".format(value, name)
+                )
             if self.min and value < self.min:
-                raise OverflowError()
+                raise OverflowError(
+                    "'{0}' invalid for field '{1}'".format(value, name)
+                )
 
 class Enum(_BaseType):
     '''
@@ -125,9 +137,9 @@ class Enum(_BaseType):
         self.eltype = None
         super(Enum, self).__init__(**kwargs)
 
-    def validate(self, value):
+    def validate(self, value, name=''):
         if value not in self._values:
-            raise TypeError("Value {0} not valid for this enum".format(value))
+            raise ValueError("'{0}' invalid for field '{1}'".format(value, name))
 
 class List(_BaseType):
     '''
@@ -143,16 +155,16 @@ class List(_BaseType):
     def map(self):
         return self.parent.map()
 
-    def validate(self, value):
+    def validate(self, value, name=''):
         #No need to run validation if null is allowed and value is null
         if self.null and value == None:
             return
 
         if not isinstance(value, tuple) and not isinstance(value, list):
-            raise TypeError("List neither tuple nor list")
+            raise TypeError("List must contain iterable type for field '{0}'".format(name))
 
         for i in value:
-            self.parent.validate(i)
+            self.parent.validate(i, name=name)
 
 class Dict(_BaseType):
     '''
@@ -194,13 +206,16 @@ class Dict(_BaseType):
 
         return mapping
 
-    def validate(self, value):
+    def validate(self, value, name=''):
         #No need to run validation if null is allowed and value is null
         if self.null and value == None:
             return
 
         if value is None:
-            raise TypeError("Value null not allowed")
+            raise ValueError("'{0}' invalid for field '{1}'".format(value, name))
 
         for key in self._comp.keys():
-            self._comp[key].validate(value.get(key))
+            self._comp[key].validate(
+                value.get(key), 
+                ".".join((name, key))
+            )
