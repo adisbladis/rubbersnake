@@ -197,12 +197,14 @@ class Dict(_BaseType):
         if "type" not in mapping:
             mapping["type"] = "object"
 
-        properties = {}
-        for key in self._comp:
-            current = {}
-            if current is not None:
-                properties[key] = self._comp[key].map()
-        mapping["properties"] = properties
+        # Special objects (such as completions) will not properties
+        if self._comp:
+            properties = {}
+            for key in self._comp:
+                current = {}
+                if current is not None:
+                    properties[key] = self._comp[key].map()
+            mapping["properties"] = properties
 
         return mapping
 
