@@ -204,7 +204,9 @@ class Dict(_BaseType):
                 current = {}
                 if current is not None:
                     properties[key] = self._comp[key].map()
-            mapping["properties"] = properties
+
+            if properties:
+                mapping["properties"] = properties
 
         return mapping
 
